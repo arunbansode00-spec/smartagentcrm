@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartAgentCRM demo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#f5f6f8;color:#1c2330}
+header{background:#1f3a5f;color:#fff;padding:18px 24px}header h1{margin:0;font-size:20px}header p{margin:4px 0 0;font-size:13px;opacity:.85}
+main{max-width:1000px;margin:20px auto;padding:0 16px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+section{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{margin:0 0 4px;font-size:16px}small{color:#5b6475}
+label{display:block;font-size:12px;color:#5b6475;margin-top:8px}
+input,select{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #c9cfda;border-radius:6px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+button{margin-top:12px;background:#1f3a5f;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:14px;cursor:pointer}
+.out{margin-top:12px;background:#eef2f8;border-radius:6px;padding:10px;font-size:14px;min-height:20px;white-space:pre-wrap}
+.warn{color:#8a5a00}.bad{color:#b3261e}.ok{color:#17653a}
+</style></head><body>
+<header><h1>SmartAgentCRM: financial intelligence for independent agents</h1>
+<p>Demo of the four models. API docs: <a style="color:#cfe1ff" href="/docs">/docs</a></p></header>
+<main>
+<section><h2>Fair property value</h2><small>Estimated price with a low to high range</small>
+<form id="fv"><div class="grid">
+<div><label>Bedrooms</label><input name="bedrooms" type="number" value="3"></div>
+<div><label>Bathrooms</label><input name="bathrooms" type="number" step="0.25" value="2"></div>
+<div><label>Living area (sq ft)</label><input name="living_area" type="number" value="1800"></div>
+<div><label>Lot area (sq ft)</label><input name="lot_area" type="number" value="6000"></div>
+<div><label>Floors</label><input name="floors" type="number" step="0.5" value="1"></div>
+<div><label>Waterfront (0 or 1)</label><input name="waterfront" type="number" value="0"></div>
+<div><label>Views (0-4)</label><input name="views" type="number" value="0"></div>
+<div><label>Condition (1-5)</label><input name="condition" type="number" value="3"></div>
+<div><label>Grade (1-13)</label><input name="grade" type="number" value="7"></div>
+<div><label>Built year</label><input name="built_year" type="number" value="1975"></div>
+<div><label>Latitude</label><input name="latitude" type="number" step="any" value="52.8"></div>
+<div><label>Longitude</label><input name="longitude" type="number" step="any" value="-114.4"></div>
+</div><button>Estimate value</button></form><div class="out" id="fv-out"></div></section>
+
+<section><h2>Commission forecast</h2><small>Next months, all 27 postcodes together</small>
+<form id="fc"><div class="grid">
+<div><label>Months ahead (1-12)</label><input name="months" type="number" value="3" min="1" max="12"></div>
+<div><label>Commission rate</label><input name="commission_rate" type="number" step="0.005" value="0.02"></div>
+</div><button>Forecast</button></form><div class="out" id="fc-out"></div></section>
+
+<section><h2>Deal anomaly check</h2><small>Is this sale price unusual for its postcode and type?</small>
+<form id="an"><div class="grid">
+<div><label>Postcode</label><input name="postcode" type="number" value="2600"></div>
+<div><label>Type</label><select name="property_type"><option>house</option><option>unit</option></select></div>
+<div><label>Bedrooms</label><input name="bedrooms" type="number" value="3"></div>
+<div><label>Price (AUD)</label><input name="price" type="number" value="900000"></div>
+</div><button>Check deal</button></form><div class="out" id="an-out"></div></section>
+
+<section><h2>Client risk score</h2><small class="warn">Demo only: the loan data gives chance-level predictions (AUC about 0.50)</small>
+<form id="rk"><div class="grid">
+<div><label>Income</label><input name="Income" type="number" value="5000000"></div>
+<div><label>Age</label><input name="Age" type="number" value="30"></div>
+<div><label>Experience (yrs)</label><input name="Experience" type="number" value="5"></div>
+<div><label>Current job (yrs)</label><input name="CURRENT_JOB_YRS" type="number" value="3"></div>
+<div><label>Current house (yrs)</label><input name="CURRENT_HOUSE_YRS" type="number" value="11"></div>
+<div><label>Marital</label><select name="Marital"><option>single</option><option>married</option></select></div>
+<div><label>House ownership</label><select name="House_Ownership"><option>rented</option><option>owned</option><option>norent_noown</option></select></div>
+<div><label>Car ownership</label><select name="Car_Ownership"><option>no</option><option>yes</option></select></div>
+<div><label>Profession</label><input name="Profession" list="prof" value="Engineer"><datalist id="prof"></datalist></div>
+<div><label>City</label><input name="CITY" value="Pune"></div>
+<div><label>State</label><input name="STATE" list="state" value="Maharashtra"><datalist id="state"></datalist></div>
+</div><button>Score client</button></form><div class="out" id="rk-out"></div></section>
+</main>
+<script>
+const money = n => Number(n).toLocaleString('en-US');
+function body(form){const o={};new FormData(form).forEach((v,k)=>{o[k]=v!==''&&!isNaN(v)&&k!=='Profession'&&k!=='CITY'&&k!=='STATE'?Number(v):v});return o}
+async function call(url,opts,out,render){
+  const el=document.getElementById(out); el.textContent='Working...';
+  try{const r=await fetch(url,opts); const j=await r.json();
+    if(!r.ok){el.innerHTML='<span class="bad">'+(typeof j.detail==='string'?j.detail:JSON.stringify(j.detail))+'</span>';return}
+    el.innerHTML=render(j)}catch(e){el.innerHTML='<span class="bad">Could not reach the API: '+e+'</span>'}}
+const post=f=>({method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body(f))});
+document.getElementById('fv').onsubmit=e=>{e.preventDefault();call('/fair-value',post(e.target),'fv-out',j=>
+ '<b>Fair value: '+money(j.fair_value)+'</b><br>Range: '+money(j.low)+' to '+money(j.high)+'<br><small>'+j.note+'</small>')};
+document.getElementById('fc').onsubmit=e=>{e.preventDefault();const b=body(e.target);
+ call('/forecast?months='+b.months+'&commission_rate='+b.commission_rate,{},'fc-out',j=>
+ j.forecast.map(x=>x.month+': AUD '+money(x.commission_pool)).join('<br>')+'<br><small>'+j.note+'</small>')};
+document.getElementById('an').onsubmit=e=>{e.preventDefault();call('/anomaly',post(e.target),'an-out',j=>
+ '<b class="'+(j.is_anomaly?'bad':'ok')+'">'+(j.is_anomaly?'Unusual price: review this deal':'Looks normal')+'</b><br>Typical price for this group: AUD '+money(j.typical_price_for_group)+'<br>z-score '+j.z_score+', score '+j.anomaly_score+' (flag above '+j.threshold+')')};
+document.getElementById('rk').onsubmit=e=>{e.preventDefault();call('/risk',post(e.target),'rk-out',j=>
+ '<b>'+j.risk_bucket+' risk</b> (probability '+j.default_probability+')<br><small class="warn">'+j.warning+'</small>')};
+fetch('/risk/options').then(r=>r.json()).then(o=>{
+ document.getElementById('prof').innerHTML=o.Profession.map(x=>'<option value="'+x+'">').join('');
+ document.getElementById('state').innerHTML=o.STATE.map(x=>'<option value="'+x+'">').join('')}).catch(()=>{});
+</script></body></html>

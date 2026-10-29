@@ -1,0 +1,101 @@
+{
+ "india": {
+  "models": {
+   "LinearReg(log)": {
+    "mae": 107085.0,
+    "rmse": 199992.0,
+    "r2": 0.7162,
+    "mape": 18.62,
+    "medape": 14.54
+   },
+   "RandomForest(log)": {
+    "mae": 69543.0,
+    "rmse": 139297.0,
+    "r2": 0.8623,
+    "mape": 12.03,
+    "medape": 8.38
+   },
+   "HistGB(log)": {
+    "mae": 61541.0,
+    "rmse": 107694.0,
+    "r2": 0.9177,
+    "mape": 11.26,
+    "medape": 8.29
+   }
+  },
+  "interval": {
+   "nominal": 0.8,
+   "coverage": 0.725,
+   "median_rel_width": 0.291
+  },
+  "cv_r2_log": [
+   0.9088,
+   0.0022
+  ],
+  "permutation_importance": [
+   [
+    "Lattitude",
+    0.5635
+   ],
+   [
+    "living area",
+    0.1956
+   ],
+   [
+    "grade of the house",
+    0.1433
+   ],
+   [
+    "Longitude",
+    0.0698
+   ],
+   [
+    "living_area_renov",
+    0.0168
+   ],
+   [
+    "lot area",
+    0.0163
+   ],
+   [
+    "age",
+    0.0127
+   ],
+   [
+    "Postal Code",
+    0.0121
+   ]
+  ]
+ },
+ "australia": {
+  "rows": 29580,
+  "ma_match_rate": 0.9938,
+  "train_test": [
+   24337,
+   5243
+  ],
+  "models": {
+   "MA lookup (heuristic baseline)": {
+    "mae": 144805.0,
+    "rmse": 230911.0,
+    "r2": 0.3815,
+    "mape": 21.87,
+    "medape": 17.94
+   },
+   "Locality-median table (heuristic baseline)": {
+    "mae": 129315.0,
+    "rmse": 203549.0,
+    "r2": 0.5199,
+    "mape": 17.65,
+    "medape": 15.38
+   },
+   "HistGB (postcode, beds, type, date)": {
+    "mae": 92382.0,
+    "rmse": 156269.0,
+    "r2": 0.7172,
+    "mape": 13.99,
+    "medape": 9.98
+   }
+  }
+ }
+}

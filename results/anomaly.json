@@ -1,0 +1,22 @@
+{
+ "rows": 29396,
+ "injected": 293,
+ "IsolationForest": {
+  "auc": 0.9963,
+  "precision_at_1pct": 0.7577
+ },
+ "Robust z-score (group)": {
+  "auc": 0.9985,
+  "precision_at_1pct": 0.8498
+ },
+ "|log price / MA| rule": {
+  "auc": 0.996,
+  "precision_at_1pct": 0.6962
+ },
+ "iforest_recall_by_factor": {
+  "0.2": 0.945,
+  "0.3": 0.782,
+  "3.0": 0.438,
+  "4.0": 0.882
+ }
+}
